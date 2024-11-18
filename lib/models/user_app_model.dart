@@ -1,45 +1,59 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserAppModel {
-  final String name;
+  final int carnet;
   final String email;
-  final String uid;
-  final String tarjetaId;
-  final String vehiculoId;
-  final DateTime createdAt;
+  final bool acountState;
   final DateTime updatedAt;
+  final DateTime createdAt;
+  final String profilePicture;
+  final int rolId;
+  final String uid;
+  final String vehicleId;
+  final String name;
   final double saldo;
-  final String profilePictureUrl;
-  final int carnetIdentidad;
-  final bool isActive;
 
   UserAppModel({
-    required this.name,
+    required this.carnet,
     required this.email,
-    required this.uid,
-    required this.createdAt,
+    required this.acountState,
     required this.updatedAt,
-    required this.tarjetaId,
+    required this.createdAt,
+    required this.profilePicture,
+    required this.rolId,
+    required this.uid,
+    required this.vehicleId,
+    required this.name,
     required this.saldo,
-    required this.vehiculoId,
-    required this.profilePictureUrl,
-    required this.carnetIdentidad,
-    required this.isActive,
   });
 
-  factory UserAppModel.fromMap(Map<String, dynamic> map) {
+  factory UserAppModel.fromMap(Map<String, dynamic> json) {
     return UserAppModel(
-      name: map["name"],
-      email: map["email"],
-      uid: map["uid"],
-      createdAt: (map["createdAt"] as Timestamp).toDate(),
-      updatedAt: (map["updatedAt"] as Timestamp).toDate(),
-      tarjetaId: map["tarjeta_id"],
-      saldo: (map["saldo"] as int).toDouble(),
-      vehiculoId: map["vehiculo_id"],
-      profilePictureUrl: map["profile_picture_url"],
-      carnetIdentidad: map["carnet_identidad"],
-      isActive: map["activo"],
+      carnet: json['carnet_identidad'],
+      email: json['correo'],
+      acountState: json['estado_cuenta'],
+      updatedAt: (json['fecha_actualizacion'] as Timestamp).toDate(),
+      createdAt: (json['fecha_creacion'] as Timestamp).toDate(),
+      profilePicture: json['foto_perfil'],
+      rolId: json['id_rol'],
+      uid: json['id_usuario'],
+      vehicleId: json['id_vehiculo'],
+      name: json['nombre'],
+      saldo: json['saldo']?.toDouble() ?? 0.0,
     );
   }
+
+  Map<String, dynamic> appUserToJson() => {
+        'carnet_identidad': carnet,
+        'correo': email,
+        'estado_cuenta': acountState,
+        'fecha_actualizacion': updatedAt,
+        'fecha_creacion': createdAt,
+        'foto_perfil': profilePicture,
+        'id_rol': rolId,
+        'id_usuario': uid,
+        'id_vehiculo': vehicleId,
+        'nombre': name,
+        'saldo': saldo,
+      };
 }

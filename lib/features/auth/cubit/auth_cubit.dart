@@ -31,7 +31,7 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthError());
       }
     } catch (e) {
-      print(e.toString());
+      print("EL ERROR AL INICIAR SESION ES: $e");
       emit(AuthError());
     }
   }

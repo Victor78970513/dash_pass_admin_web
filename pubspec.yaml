@@ -43,9 +43,16 @@ dependencies:
   flutter_bloc: ^8.1.6
   google_fonts: ^6.2.1
   shared_preferences: ^2.2.3
-  flutter_map: ^7.0.2
-  webview_flutter: ^4.8.0
-  latlong2: ^0.9.1
+  google_maps_flutter: ^2.6.1
+  equatable: ^2.0.5
+  flutter_animate: ^4.5.0
+  font_awesome_flutter: ^10.8.0
+  fl_chart: ^0.69.0
+  intl: ^0.20.0
+  pdf: ^3.11.1
+  path_provider: ^2.1.4
+  open_file: ^3.5.4
+  screenshot: ^2.5.0
 
 dev_dependencies:
   flutter_test:

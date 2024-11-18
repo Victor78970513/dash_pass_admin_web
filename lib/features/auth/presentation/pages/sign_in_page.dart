@@ -3,8 +3,9 @@ import 'package:dash_pass_web/features/auth/presentation/widgets/auth_input.dart
 import 'package:dash_pass_web/features/users/presentation/pages/users_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SignInPage extends StatefulWidget {
   static const name = "/signin";
@@ -17,6 +18,7 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   final TextEditingController emailCtrl = TextEditingController();
   final TextEditingController passCtrl = TextEditingController();
+  bool isHuman = false; // Estado para el checkbox
 
   @override
   Widget build(BuildContext context) {
@@ -32,20 +34,34 @@ class _SignInPageState extends State<SignInPage> {
         builder: (context, state) {
           return Stack(
             children: [
-              // Fondo con gradiente
+              // Background with gradient
               Container(
                 decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 210, 206, 246),
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xFF1C3C63),
+                      Color(0xFF4A90E2),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ),
+              // Animated background shapes
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: BackgroundShapesPainter(),
                 ),
               ),
               Center(
                 child: Container(
-                  height: size.height * 0.7,
-                  width: size.width * 0.4,
-                  padding: const EdgeInsets.all(20),
+                  height: size.height * 0.75,
+                  width: size.width * 0.35,
+                  padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
-                    color: const Color.fromRGBO(42, 39, 98, 1),
-                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.white.withOpacity(0.2)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
@@ -61,35 +77,35 @@ class _SignInPageState extends State<SignInPage> {
                         // Logo
                         SvgPicture.asset(
                           "assets/logos/dash_pass.svg",
-                          width: size.width * 0.1,
-                          fit: BoxFit.fill,
+                          width: size.width * 0.08,
+                          fit: BoxFit.contain,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 30),
 
-                        // Título
-                        const Text(
+                        // Title
+                        Text(
                           "Sistema de Gestión de Peajes",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 22,
+                          style: GoogleFonts.poppins(
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 15),
 
-                        // Subtítulo
-                        const Text(
+                        // Subtitle
+                        Text(
                           "Inicie sesión con su cuenta administrativa",
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: 16,
-                            color: Colors.white,
+                            color: Colors.white.withOpacity(0.8),
                           ),
                         ),
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 40),
 
-                        // Campos de texto
+                        // Text fields
                         AuthInput(
                           title: "Correo Electrónico",
                           controller: emailCtrl,
@@ -104,40 +120,69 @@ class _SignInPageState extends State<SignInPage> {
                           obscureText: true,
                           icon: Icons.lock_outline,
                         ),
-                        const SizedBox(height: 30),
 
-                        // Botón de inicio de sesión
-                        GestureDetector(
-                          onTap: () {
-                            context.read<AuthCubit>().signIn(
-                                email: emailCtrl.text.trim(),
-                                password: passCtrl.text.trim());
-                          },
-                          child: Container(
-                            width: 180,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: const Color.fromARGB(255, 210, 206, 246),
+                        // Checkbox and "No soy un robot"
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Checkbox(
+                              value: isHuman,
+                              onChanged: (value) {
+                                setState(() {
+                                  isHuman = value ?? false;
+                                });
+                              },
+                              activeColor: const Color(0xFF4A90E2),
                             ),
-                            child: state is AuthLoading
-                                ? const Center(
-                                    child: CircularProgressIndicator(
-                                        color: Colors.black),
-                                  )
-                                : const Center(
-                                    child: Text(
-                                      "Ingresar",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                          ),
+                            Text(
+                              "No soy un robot",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 10),
+
+                        // Login button
+                        ElevatedButton(
+                          onPressed: isHuman
+                              ? () {
+                                  context.read<AuthCubit>().signIn(
+                                      email: emailCtrl.text.trim(),
+                                      password: passCtrl.text.trim());
+                                }
+                              : null, // Deshabilitar si no está marcado
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF4A90E2),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 40),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 5,
+                          ),
+                          child: state is AuthLoading
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  "Ingresar",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),

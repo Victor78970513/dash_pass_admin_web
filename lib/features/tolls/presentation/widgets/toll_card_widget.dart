@@ -1,146 +1,201 @@
-import 'package:dash_pass_web/models/toll_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dash_pass_web/models/user_model.dart';
-import 'package:flutter/cupertino.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:dash_pass_web/models/toll_model.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
-class TollCardWidget extends StatelessWidget {
+class TollCardWidget extends StatefulWidget {
   final TollModel toll;
   const TollCardWidget({super.key, required this.toll});
+
+  @override
+  State<TollCardWidget> createState() => _TollCardWidgetState();
+}
+
+class _TollCardWidgetState extends State<TollCardWidget> {
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
+  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 30),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
       child: Container(
-        // height: size.height * 0.4,
-        width: size.width * 0.25,
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xff6A4CFF), Color(0xff8A7CBE)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Colors.black26,
-              blurRadius: 10,
-              offset: Offset(0, 5),
+              color: Colors.black.withOpacity(0.2),
+              offset: const Offset(5, 5),
+              blurRadius: 32,
             )
           ],
         ),
-        child: Column(
-          children: [
-            // Nombre del peaje
-            FutureBuilder<DocumentSnapshot>(
-              future: FirebaseFirestore.instance
-                  .collection('administradores')
-                  .doc(toll.userId)
-                  .get(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                }
-
-                if (snapshot.hasError ||
-                    !snapshot.hasData ||
-                    !snapshot.data!.exists) {
-                  return const Text(
-                    "Encargado no disponible",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  );
-                }
-
-                final adminData = UserModel.fromJson(
-                    snapshot.data!.data() as Map<String, dynamic>);
-
-                return Padding(
-                  padding: const EdgeInsets.only(top: 20, bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: adminData.profilePicture.isNotEmpty
-                            ? NetworkImage(adminData.profilePicture)
-                                as ImageProvider
-                            : const AssetImage(
-                                "assets/images/no_profile_image.jpg"),
-                        radius: 40,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "ENCARGADO: ${adminData.name}",
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "CORREO: ${adminData.correo}",
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                );
-              },
-            ),
-            Container(
-              height: 200,
-              width: double.infinity,
-              color: Colors.amber,
-            ),
-            const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Nombre: ${toll.nombre}",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    ...List.generate(
-                      toll.tarifas.length,
-                      (index) {
-                        final tarifa = toll.tarifas[index];
-                        return Text(
-                          "${tarifa.tipo}: Bs. ${tarifa.monto}",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        );
-                      },
-                    ),
+        child: Card(
+          elevation: 8,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              width: size.width * 0.3,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.blue.shade600,
+                    const Color.fromARGB(255, 43, 91, 150),
                   ],
                 ),
               ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 200,
+                    width: double.infinity,
+                    child: GoogleMap(
+                      mapType: MapType.normal,
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(
+                          widget.toll.latitud,
+                          widget.toll.longitud,
+                        ),
+                        zoom: 14,
+                      ),
+                      onMapCreated: (GoogleMapController controller) {
+                        _controller.complete(controller);
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 30,
+                              backgroundImage: (widget
+                                              .toll.adminData?.profilePicture ??
+                                          '')
+                                      .isNotEmpty
+                                  ? NetworkImage(
+                                      widget.toll.adminData!.profilePicture)
+                                  : const AssetImage(
+                                          "assets/images/no_profile_image.jpg")
+                                      as ImageProvider,
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.toll.name,
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "Encargado: ${widget.toll.adminData?.name ?? 'Sin encargado'}",
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.white70,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        AnimatedCrossFade(
+                          firstChild: const SizedBox.shrink(),
+                          secondChild: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Correo: ${widget.toll.adminData?.email ?? 'sin correo'}",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                "Tarifas:",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              ...widget.toll.tarifas.map((tarifa) => Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          tarifa.clasificacion.toString(),
+                                          style: GoogleFonts.poppins(
+                                              color: Colors.white,
+                                              fontSize: 16),
+                                        ),
+                                        Text(
+                                          "Bs. ${tarifa.monto}",
+                                          style: GoogleFonts.poppins(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600),
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ],
+                                    ),
+                                  )),
+                            ],
+                          ),
+                          crossFadeState: _isExpanded
+                              ? CrossFadeState.showSecond
+                              : CrossFadeState.showFirst,
+                          duration: const Duration(milliseconds: 300),
+                        ),
+                        const SizedBox(height: 16),
+                        Center(
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _isExpanded = !_isExpanded;
+                              });
+                            },
+                            child: Text(
+                              _isExpanded ? "Ver menos" : "Ver más",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 10),
-          ],
+          ),
         ),
       ),
-    );
+    ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.2, end: 0);
   }
 }
