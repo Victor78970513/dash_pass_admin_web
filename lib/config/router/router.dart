@@ -2,8 +2,11 @@ import 'package:dash_pass_web/features/auth/presentation/pages/sign_in_page.dart
 import 'package:dash_pass_web/features/home/presentation/pages/home_page.dart';
 import 'package:dash_pass_web/features/reports/presentation/pages/reports_page.dart';
 import 'package:dash_pass_web/features/tolls/presentation/pages/tolls_page.dart';
+import 'package:dash_pass_web/features/users/presentation/pages/create_user_page.dart';
+import 'package:dash_pass_web/features/users/presentation/pages/edit_user_page.dart';
 import 'package:dash_pass_web/features/users/presentation/pages/users_page.dart';
 import 'package:dash_pass_web/features/vehicles/presentation/pages/vehicles_page.dart';
+import 'package:dash_pass_web/models/user_app_model.dart';
 import 'package:go_router/go_router.dart';
 
 class DashPass {
@@ -30,6 +33,20 @@ class DashPass {
             path: UsersPage.name,
             name: UsersPage.name,
             builder: (context, state) => const UsersPage(),
+          ),
+          GoRoute(
+            path: CreateUserPage.name,
+            name: CreateUserPage.name,
+            builder: (context, state) => const CreateUserPage(),
+          ),
+          GoRoute(
+            path: EditUserPage.name,
+            name: EditUserPage.name,
+            builder: (context, state) {
+              final user = (state.extra as Map<String, dynamic>? ?? {})["user"]
+                  as UserAppModel;
+              return EditUserPage(user: user);
+            },
           ),
 
           // Subruta: Flujo vehicular

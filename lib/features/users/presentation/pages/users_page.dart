@@ -1,10 +1,23 @@
-import 'package:dash_pass_web/features/users/presentation/cubit/users_cubit.dart';
-import 'package:dash_pass_web/features/users/presentation/widgets/add_user_modal.dart';
+import 'package:dash_pass_web/features/users/presentation/cubits/users/users_cubit.dart';
+import 'package:dash_pass_web/features/users/presentation/pages/create_user_page.dart';
+import 'package:dash_pass_web/features/users/presentation/widgets/filter_users_modal.dart';
+import 'package:dash_pass_web/features/users/presentation/widgets/user_info_header.dart';
+import 'package:dash_pass_web/features/users/presentation/widgets/user_info_widget.dart';
+import 'package:dash_pass_web/features/users/presentation/widgets/users_loading_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:dash_pass_web/models/user_app_model.dart';
-import 'package:dash_pass_web/features/users/presentation/widgets/edit_user_widget.dart';
+
+List<BoxShadow> boxShadow = [
+  BoxShadow(
+    color: Colors.black.withOpacity(0.1),
+    offset: const Offset(0, 5),
+    blurRadius: 5,
+    blurStyle: BlurStyle.inner,
+  )
+];
 
 class UsersPage extends StatefulWidget {
   static const name = "/users-page";
@@ -35,150 +48,159 @@ class _UsersPageState extends State<UsersPage> {
     final cantUsers = context.watch<UsersCubit>().usersQuantity;
     return Container(
       color: const Color(0xffF4F4F4),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  "Listado de usuarios",
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 30),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Listado de Usuarios",
                   style: GoogleFonts.poppins(
                     color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 28,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const Spacer(),
-                Text(
-                  "$cantUsers ${cantUsers > 1 ? "usuarios" : "usuario"}",
-                  style: GoogleFonts.poppins(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 20,
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Material(
-                  elevation: 6,
-                  borderRadius: BorderRadius.circular(15),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    height: 60,
-                    width: size.width * 0.15,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.search, color: Colors.black54),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: TextField(
-                            controller: searchController,
-                            style: GoogleFonts.poppins(fontSize: 16),
-                            decoration: InputDecoration(
-                              hintText: "Buscar usuario por nombre",
-                              border: InputBorder.none,
-                              hintStyle: TextStyle(color: Colors.grey.shade600),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 30),
-                Material(
-                  elevation: 6,
-                  borderRadius: BorderRadius.circular(15),
-                  child: GestureDetector(
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return const AddUserModal();
-                        },
-                      );
-                    },
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+                boxShadow: boxShadow,
+              ),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20),
                     child: Container(
-                      height: 60,
+                      width: size.width * 0.2,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1C3C63),
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(
+                            color: Color.fromARGB(255, 176, 181, 185)),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 10),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.person_add,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              "Agregar usuario",
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 18,
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: TextField(
+                              controller: searchController,
+                              style: GoogleFonts.poppins(fontSize: 16),
+                              decoration: InputDecoration(
+                                hintText: "Buscar usuario por nombre",
+                                border: InputBorder.none,
+                                hintStyle:
+                                    TextStyle(color: Colors.grey.shade600),
                               ),
                             ),
-                            const SizedBox(width: 10),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(width: 10),
+                          const Icon(Icons.search, color: Colors.black54),
+                          const SizedBox(width: 10),
+                        ],
                       ),
                     ),
                   ),
-                ),
-              ],
+                  const Spacer(),
+                  UsersPageActionButton(
+                    title: "Crear usuario",
+                    icon: Icons.person_add_alt_1_outlined,
+                    onTap: () => context.go(CreateUserPage.name),
+                  ),
+                  const SizedBox(width: 20),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 0),
+            const SizedBox(height: 10),
+            Expanded(
               child: BlocBuilder<UsersCubit, UsersState>(
                   builder: (context, state) {
                 switch (state) {
                   case UsersInitial():
                   case UsersLoading():
-                    return const Center(child: CircularProgressIndicator());
-
+                    return const UsersLoadingShimmer();
                   case UsersLoaded():
-                    final users = state.users.where((user) {
-                      return user.name.toLowerCase().contains(searchQuery);
-                    }).toList();
-                    return LayoutBuilder(builder: (context, constraints) {
-                      return SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: ConstrainedBox(
-                            constraints:
-                                BoxConstraints(minWidth: constraints.maxWidth),
-                            child: DataTable(
-                              // ignore: deprecated_member_use
-                              dataRowHeight: 90,
-                              headingTextStyle: GoogleFonts.poppins(
-                                color: Colors.indigo,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
+                    final users = state.users
+                        .where((user) =>
+                            user.name.toLowerCase().contains(searchQuery))
+                        .toList();
+                    return ScrollConfiguration(
+                      behavior: ScrollConfiguration.of(context)
+                          .copyWith(scrollbars: false),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 30),
+                              child: Row(
+                                children: [
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      "Mostrando $cantUsers usuarios",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.black,
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  GestureDetector(
+                                    onTap: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return const FilterUsersModal();
+                                          });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                          border:
+                                              Border.all(color: Colors.black)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 8),
+                                        child: Row(
+                                          children: [
+                                            const Icon(FontAwesomeIcons.filter),
+                                            const SizedBox(width: 10),
+                                            Text(
+                                              "Filtrar por",
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              dataTextStyle: GoogleFonts.poppins(
-                                color: Colors.black,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              columns: _buildColumns(),
-                              rows: _buildRows(users, context),
                             ),
-                          ),
+                            const UserInfoHeader(),
+                            ...List.generate(users.length + 1, (index) {
+                              if (index != users.length) {
+                                final user = users[index];
+                                return UserInfoWidget(user: user);
+                              } else {
+                                return const SizedBox(height: 40);
+                              }
+                            })
+                          ],
                         ),
-                      );
-                    });
-
+                      ),
+                    );
                   case UsersError(message: final message):
                     return Center(
                       child: Text(message),
@@ -186,88 +208,56 @@ class _UsersPageState extends State<UsersPage> {
                 }
               }),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-List<DataColumn> _buildColumns() {
-  return const [
-    DataColumn(label: Expanded(child: Center(child: Text("Foto de perfil")))),
-    DataColumn(label: Expanded(child: Center(child: Text("Nombre")))),
-    DataColumn(label: Expanded(child: Center(child: Text("Correo")))),
-    DataColumn(label: Expanded(child: Center(child: Text("Saldo")))),
-    DataColumn(label: Expanded(child: Center(child: Text("Carnet")))),
-    DataColumn(label: Expanded(child: Center(child: Text("Usuario desde")))),
-    DataColumn(label: Expanded(child: Center(child: Text("Acciones")))),
-  ];
-}
-
-List<DataRow> _buildRows(List<UserAppModel> users, BuildContext context) {
-  return List.generate(users.length, (index) {
-    final user = users[index];
-    return DataRow(
-      cells: [
-        DataCell(Center(
-          child: CircleAvatar(
-            backgroundImage: user.profilePicture.isNotEmpty
-                ? NetworkImage(user.profilePicture)
-                : const AssetImage(
-                    "assets/images/no_profile_image.jpg",
-                  ) as ImageProvider,
-            radius: 35,
-          ),
-        )),
-        DataCell(
-          Center(
-            child: Text(user.name),
-          ),
-        ),
-        DataCell(
-          Center(
-            child: Text(user.email),
-          ),
-        ),
-        DataCell(
-          Center(
-            child: Text("Bs. ${user.saldo.toStringAsFixed(2)}"),
-          ),
-        ),
-        DataCell(
-          Center(
-            child: Text(user.carnet.toString()),
-          ),
-        ),
-        DataCell(
-          Center(
-            child: Text(
-                "${user.updatedAt.day}/${user.updatedAt.month}/${user.updatedAt.year}"),
-          ),
-        ),
-        DataCell(
-          Center(
-            child: IconButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return EditUserModal(
-                      userId: user.uid,
-                      initialName: user.name,
-                      initialSaldo: user.saldo,
-                      initialCarnet: user.carnet,
-                      initialEmail: user.email,
-                    );
-                  },
-                );
-              },
-              icon: const Icon(Icons.edit, color: Colors.indigo),
-            ),
-          ),
-        ),
-      ],
-    );
+class UsersPageActionButton extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Function()? onTap;
+  const UsersPageActionButton({
+    super.key,
+    required this.title,
+    required this.icon,
+    this.onTap,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(
+          color: const Color(0xFF1C3C63),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                color: Colors.white,
+                size: 35,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

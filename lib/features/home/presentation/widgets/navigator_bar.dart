@@ -11,15 +11,24 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class LateralNavigatorBar extends StatelessWidget {
+class LateralNavigatorBar extends StatefulWidget {
   const LateralNavigatorBar({super.key});
 
   @override
+  State<LateralNavigatorBar> createState() => _LateralNavigatorBarState();
+}
+
+class _LateralNavigatorBarState extends State<LateralNavigatorBar> {
+  bool isExpanded = true;
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Container(
+    final barWidth = isExpanded ? size.width * 0.2 : 100.0;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
       height: double.infinity,
-      width: size.width * 0.2,
+      // width: size.width * 0.2,
+      width: barWidth,
       decoration: BoxDecoration(
         color: const Color(0xFF1C3C63),
         boxShadow: [
@@ -30,58 +39,82 @@ class LateralNavigatorBar extends StatelessWidget {
           ),
         ],
       ),
+
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 30),
-          Align(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 25),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                isExpanded = !isExpanded;
+              });
+            },
+            child: Align(
+              alignment: Alignment.center,
               child: SizedBox(
-                height: 120,
-                width: 300,
-                child: SvgPicture.asset(
-                  "assets/logos/dash_pass.svg",
-                  fit: BoxFit.contain,
-                ),
-              ),
+                  height: 120,
+                  width: 300,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: isExpanded
+                        ? SvgPicture.asset(
+                            "assets/logos/dash_pass.svg",
+                            fit: BoxFit.contain,
+                          )
+                        : const Icon(
+                            Icons.menu,
+                            color: Colors.white,
+                            size: 35,
+                          ),
+                  )),
             ),
           ),
           const SizedBox(height: 40),
-          const LateralNavigatorItem(
-            index: 0,
-            title: "Gestión de Usuarios",
-            icon: Icons.person_outline,
-            path: UsersPage.name,
-          ),
-          const LateralNavigatorItem(
-            title: "Monitoreo Vehicular",
-            icon: Icons.directions_car_outlined,
-            path: VehiclesPage.name,
-            index: 1,
-          ),
-          const LateralNavigatorItem(
-            title: "Gestión de Peajes",
-            icon: FontAwesomeIcons.road,
-            path: TollsPage.name,
-            index: 2,
-          ),
-          const LateralNavigatorItem(
-            title: "Informes y Reportes",
-            icon: Icons.insert_chart_outlined,
-            path: ReportsPage.name,
-            index: 3,
-          ),
-          const Spacer(),
-          const LateralNavigatorItem(
-            title: "Cerrar Sesión",
-            icon: Icons.logout,
-            path: SignInPage.name,
-            index: 4,
-            show: false,
-          ),
-          const SizedBox(height: 20),
+          Expanded(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: isExpanded
+                  ? const Column(
+                      children: [
+                        LateralNavigatorItem(
+                          index: 0,
+                          title: "Gestión de Usuarios",
+                          icon: Icons.person_outline,
+                          path: UsersPage.name,
+                        ),
+                        LateralNavigatorItem(
+                          title: "Monitoreo Vehicular",
+                          icon: Icons.directions_car_outlined,
+                          path: VehiclesPage.name,
+                          index: 1,
+                        ),
+                        LateralNavigatorItem(
+                          title: "Gestión de Peajes",
+                          icon: FontAwesomeIcons.road,
+                          path: TollsPage.name,
+                          index: 2,
+                        ),
+                        LateralNavigatorItem(
+                          title: "Informes y Reportes",
+                          icon: Icons.insert_chart_outlined,
+                          path: ReportsPage.name,
+                          index: 3,
+                        ),
+                        Spacer(),
+                        LateralNavigatorItem(
+                          title: "Cerrar Sesión",
+                          icon: Icons.logout,
+                          path: SignInPage.name,
+                          index: 4,
+                          show: false,
+                        ),
+                        SizedBox(height: 20),
+                      ],
+                    )
+                  : null,
+            ),
+          )
         ],
       ),
     );

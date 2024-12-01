@@ -12,6 +12,7 @@ class UserAppModel {
   final String vehicleId;
   final String name;
   final double saldo;
+  final int phone;
 
   UserAppModel({
     required this.carnet,
@@ -25,22 +26,23 @@ class UserAppModel {
     required this.vehicleId,
     required this.name,
     required this.saldo,
+    required this.phone,
   });
 
   factory UserAppModel.fromMap(Map<String, dynamic> json) {
     return UserAppModel(
-      carnet: json['carnet_identidad'],
-      email: json['correo'],
-      acountState: json['estado_cuenta'],
-      updatedAt: (json['fecha_actualizacion'] as Timestamp).toDate(),
-      createdAt: (json['fecha_creacion'] as Timestamp).toDate(),
-      profilePicture: json['foto_perfil'],
-      rolId: json['id_rol'],
-      uid: json['id_usuario'],
-      vehicleId: json['id_vehiculo'],
-      name: json['nombre'],
-      saldo: json['saldo']?.toDouble() ?? 0.0,
-    );
+        carnet: json['carnet_identidad'],
+        email: json['correo'],
+        acountState: json['estado_cuenta'],
+        updatedAt: (json['fecha_actualizacion'] as Timestamp).toDate(),
+        createdAt: (json['fecha_creacion'] as Timestamp).toDate(),
+        profilePicture: json['foto_perfil'],
+        rolId: json['id_rol'],
+        uid: json['id_usuario'],
+        vehicleId: json['id_vehiculo'],
+        name: json['nombre'],
+        saldo: json['saldo']?.toDouble() ?? 0.0,
+        phone: json['telefono']);
   }
 
   Map<String, dynamic> appUserToJson() => {
@@ -55,5 +57,6 @@ class UserAppModel {
         'id_vehiculo': vehicleId,
         'nombre': name,
         'saldo': saldo,
+        'telefono': phone,
       };
 }
