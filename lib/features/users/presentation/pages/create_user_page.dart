@@ -362,8 +362,7 @@ class _CreateUserPageState extends State<CreateUserPage> {
                                         email: emailController.text,
                                         rolId: getRolIdUtil(selectedRole ?? ""),
                                         name: nameController.text,
-                                        // password: passwordController.text,
-                                        password: "123456",
+                                        password: passwordController.text,
                                         phone: int.parse(phoneController.text),
                                       );
                                   context.go(UsersPage.name);

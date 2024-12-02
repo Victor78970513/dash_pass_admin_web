@@ -11,12 +11,9 @@ class FilterUsersModal extends StatelessWidget {
   Widget build(BuildContext context) {
     final filtersCubit = context.watch<FilterUsersCubit>();
     return Dialog(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.2,
-          maxHeight: MediaQuery.of(context).size.height * 0.55,
-        ),
+      child: IntrinsicHeight(
         child: Container(
+          width: 300,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
@@ -24,6 +21,7 @@ class FilterUsersModal extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 10),
                 Text(
@@ -35,78 +33,63 @@ class FilterUsersModal extends StatelessWidget {
                   ),
                 ),
                 const Divider(),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Estado",
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                BlocBuilder<FilterUsersCubit, FilterUsersState>(
-                    builder: (context, state) {
-                  return Column(
-                    children: [
-                      FilterOption(
-                        title: "Todos",
-                        onTap: () => filtersCubit.updateAccountState("Todos"),
-                        isSelected: state.accountState == "Todos",
-                      ),
-                      FilterOption(
-                        title: "Activos",
-                        onTap: () => filtersCubit.updateAccountState("Activos"),
-                        isSelected: state.accountState == "Activos",
-                      ),
-                      FilterOption(
-                        title: "Inactivos",
-                        onTap: () =>
-                            filtersCubit.updateAccountState("Inactivos"),
-                        isSelected: state.accountState == "Inactivos",
-                      ),
-                    ],
-                  );
-                }),
-                const SizedBox(height: 20),
-                const Divider(),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Rol",
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
+                _buildSectionTitle("Estado"),
                 BlocBuilder<FilterUsersCubit, FilterUsersState>(
                   builder: (context, state) {
-                    return Column(children: [
-                      FilterOption(
+                    return Column(
+                      children: [
+                        FilterOption(
                           title: "Todos",
-                          onTap: () => filtersCubit.updateRole(0),
-                          isSelected: state.roleId == 0),
-                      FilterOption(
-                          title: "Conductor",
-                          onTap: () => filtersCubit.updateRole(4),
-                          isSelected: state.roleId == 4),
-                      FilterOption(
-                          title: "Administrador",
-                          onTap: () => filtersCubit.updateRole(2),
-                          isSelected: state.roleId == 2),
-                      FilterOption(
-                          title: "Super Administrador",
-                          onTap: () => filtersCubit.updateRole(1),
-                          isSelected: state.roleId == 1),
-                    ]);
+                          onTap: () => filtersCubit.updateAccountState("Todos"),
+                          isSelected: state.accountState == "Todos",
+                        ),
+                        FilterOption(
+                          title: "Activos",
+                          onTap: () =>
+                              filtersCubit.updateAccountState("Activos"),
+                          isSelected: state.accountState == "Activos",
+                        ),
+                        FilterOption(
+                          title: "Inactivos",
+                          onTap: () =>
+                              filtersCubit.updateAccountState("Inactivos"),
+                          isSelected: state.accountState == "Inactivos",
+                        ),
+                      ],
+                    );
                   },
                 ),
-                const Spacer(),
+                const Divider(),
+                _buildSectionTitle("Rol"),
+                BlocBuilder<FilterUsersCubit, FilterUsersState>(
+                  builder: (context, state) {
+                    return Column(
+                      children: [
+                        FilterOption(
+                          title: "Todos",
+                          onTap: () => filtersCubit.updateRole(0),
+                          isSelected: state.roleId == 0,
+                        ),
+                        FilterOption(
+                          title: "Conductor",
+                          onTap: () => filtersCubit.updateRole(4),
+                          isSelected: state.roleId == 4,
+                        ),
+                        FilterOption(
+                          title: "Administrador",
+                          onTap: () => filtersCubit.updateRole(2),
+                          isSelected: state.roleId == 2,
+                        ),
+                        FilterOption(
+                          title: "Super Administrador",
+                          onTap: () => filtersCubit.updateRole(1),
+                          isSelected: state.roleId == 1,
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
                     context.read<UsersCubit>().fetchUsersWithFilters(
@@ -123,7 +106,7 @@ class FilterUsersModal extends StatelessWidget {
                   },
                   child: Container(
                     height: 40,
-                    width: MediaQuery.of(context).size.width * 0.1,
+                    width: double.infinity,
                     decoration: BoxDecoration(
                       color: const Color.fromRGBO(42, 63, 129, 1),
                       borderRadius: BorderRadius.circular(15),
@@ -132,9 +115,10 @@ class FilterUsersModal extends StatelessWidget {
                       child: Text(
                         "Aplicar",
                         style: GoogleFonts.poppins(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500),
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),
@@ -142,6 +126,23 @@ class FilterUsersModal extends StatelessWidget {
                 const SizedBox(height: 20),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Text(
+          title,
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            color: Colors.black,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),

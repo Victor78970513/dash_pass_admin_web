@@ -93,7 +93,7 @@ class _VehiclesPageState extends State<VehiclesPage> {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const VehiclesLoadingShimmer();
                 }
 
                 if (snapshot.hasError) {
