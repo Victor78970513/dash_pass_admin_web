@@ -84,7 +84,7 @@ class _LateralNavigatorBarState extends State<LateralNavigatorBar> {
                           path: UsersPage.name,
                         ),
                         LateralNavigatorItem(
-                          title: "Monitoreo Vehicular",
+                          title: "Monitoreo de pases -cobro",
                           icon: Icons.directions_car_outlined,
                           path: VehiclesPage.name,
                           index: 1,
