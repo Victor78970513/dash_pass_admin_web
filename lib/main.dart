@@ -8,9 +8,12 @@ import 'package:dash_pass_web/features/users/presentation/cubits/filter_users/fi
 import 'package:dash_pass_web/features/users/presentation/cubits/users/users_cubit.dart';
 import 'package:dash_pass_web/features/vehicles/presentation/cubit/vehicles_cubit.dart';
 import 'package:dash_pass_web/firebase_options.dart';
+import 'package:dash_pass_web/models/pase_detalle_model.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+final List<PaseDetalle> pasesToReport = [];
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

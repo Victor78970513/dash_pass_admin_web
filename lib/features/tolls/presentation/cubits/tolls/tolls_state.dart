@@ -11,6 +11,8 @@ final class TollsInitial extends TollsState {}
 
 final class TollsLoading extends TollsState {}
 
+final class TollAddedState extends TollsState {}
+
 final class TollsLoaded extends TollsState {
   final List<TollModel> tolls;
 

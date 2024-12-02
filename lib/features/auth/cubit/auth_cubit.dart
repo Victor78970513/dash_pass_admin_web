@@ -25,6 +25,7 @@ class AuthCubit extends Cubit<AuthState> {
         final user =
             UserAppModel.fromMap(response.data() as Map<String, dynamic>);
         Preferences().userRolId = user.rolId;
+        Preferences().userUUID = user.uid;
         emit(AuthSucess(uid: credential.user!.uid));
       } else {
         print("error ania");
@@ -34,5 +35,21 @@ class AuthCubit extends Cubit<AuthState> {
       print("EL ERROR AL INICIAR SESION ES: $e");
       emit(AuthError());
     }
+  }
+
+  void sendOtp(
+    String phoneNumber,
+    Function(PhoneAuthCredential verificationCompleted) onVerificationCompleted,
+    Function(Function(FirebaseAuthException)) onVerificationFailed,
+    Function(String verificationId, int? forceResendingToken) onCodeSent,
+  ) async {
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      timeout: const Duration(seconds: 60),
+      verificationCompleted: onVerificationCompleted,
+      verificationFailed: (a) {},
+      codeSent: onCodeSent,
+      codeAutoRetrievalTimeout: (verificationId) {},
+    );
   }
 }

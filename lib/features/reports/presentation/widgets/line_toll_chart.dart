@@ -99,7 +99,7 @@ class LineTollChart extends StatelessWidget {
                       ),
                       barWidth: 5,
                       isStrokeCapRound: true,
-                      dotData: const FlDotData(show: true),
+                      dotData: FlDotData(show: true),
                       belowBarData: BarAreaData(
                         show: true,
                         gradient: LinearGradient(
@@ -108,6 +108,20 @@ class LineTollChart extends StatelessWidget {
                               .toList(),
                         ),
                       ),
+                      showingIndicators: [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11
+                      ], // Mostrar todos los puntos
                     ),
                   ],
                 ),

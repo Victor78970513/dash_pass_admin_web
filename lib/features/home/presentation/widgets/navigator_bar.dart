@@ -1,6 +1,6 @@
 import 'package:dash_pass_web/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:dash_pass_web/features/home/cubit/navigation_cubit.dart';
-import 'package:dash_pass_web/features/reports/presentation/pages/reports_page.dart';
+import 'package:dash_pass_web/features/reports/presentation/pages/reports_menu.dart';
 import 'package:dash_pass_web/features/tolls/presentation/pages/tolls_page.dart';
 import 'package:dash_pass_web/features/users/presentation/pages/users_page.dart';
 import 'package:dash_pass_web/features/vehicles/presentation/pages/vehicles_page.dart';
@@ -98,7 +98,7 @@ class _LateralNavigatorBarState extends State<LateralNavigatorBar> {
                         LateralNavigatorItem(
                           title: "Informes y Reportes",
                           icon: Icons.insert_chart_outlined,
-                          path: ReportsPage.name,
+                          path: ReportsMenu.name,
                           index: 3,
                         ),
                         Spacer(),

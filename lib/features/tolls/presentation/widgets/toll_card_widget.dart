@@ -1,5 +1,7 @@
-import 'dart:async';
+import 'package:dash_pass_web/features/tolls/presentation/pages/edit_toll_page.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:dash_pass_web/models/toll_model.dart';
@@ -7,68 +9,70 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 class TollCardWidget extends StatefulWidget {
   final TollModel toll;
-  const TollCardWidget({super.key, required this.toll});
+  final double width;
+  const TollCardWidget({super.key, required this.toll, required this.width});
 
   @override
   State<TollCardWidget> createState() => _TollCardWidgetState();
 }
 
 class _TollCardWidgetState extends State<TollCardWidget> {
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
-  bool _isExpanded = false;
+  bool _showDetails = false;
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-      child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        width: widget.width,
         decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              offset: const Offset(5, 5),
-              blurRadius: 32,
+              color: Colors.black.withOpacity(0.1),
+              offset: const Offset(0, 4),
+              blurRadius: 10,
             )
           ],
         ),
         child: Card(
-          elevation: 8,
+          elevation: 0,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Container(
-              width: size.width * 0.3,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.blue.shade600,
-                    const Color.fromARGB(255, 43, 91, 150),
-                  ],
-                ),
-              ),
-              child: Column(
+          child: Stack(
+            children: [
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: 200,
-                    width: double.infinity,
-                    child: GoogleMap(
-                      mapType: MapType.normal,
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(
-                          widget.toll.latitud,
-                          widget.toll.longitud,
+                  ClipRRect(
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(20)),
+                    child: SizedBox(
+                      height: 200,
+                      width: double.infinity,
+                      child: GoogleMap(
+                        mapType: MapType.normal,
+                        initialCameraPosition: CameraPosition(
+                          target:
+                              LatLng(widget.toll.latitud, widget.toll.longitud),
+                          zoom: 15,
                         ),
-                        zoom: 14,
+                        markers: {
+                          Marker(
+                            markerId: MarkerId(widget.toll.idPeaje),
+                            position: LatLng(
+                                widget.toll.latitud, widget.toll.longitud),
+                          ),
+                        },
+                        zoomControlsEnabled: false,
+                        scrollGesturesEnabled: false,
+                        zoomGesturesEnabled: false,
+                        rotateGesturesEnabled: false,
+                        tiltGesturesEnabled: false,
+                        myLocationButtonEnabled: false,
                       ),
-                      onMapCreated: (GoogleMapController controller) {
-                        _controller.complete(controller);
-                      },
                     ),
                   ),
                   Padding(
@@ -98,17 +102,15 @@ class _TollCardWidgetState extends State<TollCardWidget> {
                                   Text(
                                     widget.toll.name,
                                     style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontSize: 22,
+                                      fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
                                   Text(
                                     "Encargado: ${widget.toll.adminData?.name ?? 'Sin encargado'}",
                                     style: GoogleFonts.poppins(
-                                      color: Colors.white70,
                                       fontSize: 14,
+                                      color: Colors.grey[600],
                                     ),
                                   ),
                                 ],
@@ -117,85 +119,155 @@ class _TollCardWidgetState extends State<TollCardWidget> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        AnimatedCrossFade(
-                          firstChild: const SizedBox.shrink(),
-                          secondChild: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.indigo,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            minimumSize: const Size(double.infinity, 50),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _showDetails = !_showDetails;
+                            });
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Correo: ${widget.toll.adminData?.email ?? 'sin correo'}",
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white70,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                "Tarifas:",
+                                _showDetails
+                                    ? "Ocultar Tarifas"
+                                    : "Ver Tarifas",
                                 style: GoogleFonts.poppins(
                                   color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              ...widget.toll.tarifas.map((tarifa) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 8),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          tarifa.clasificacion.toString(),
-                                          style: GoogleFonts.poppins(
-                                              color: Colors.white,
-                                              fontSize: 16),
-                                        ),
-                                        Text(
-                                          "Bs. ${tarifa.monto}",
-                                          style: GoogleFonts.poppins(
-                                              color: Colors.white,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600),
-                                          textAlign: TextAlign.left,
-                                        ),
-                                      ],
-                                    ),
-                                  )),
+                              const SizedBox(width: 8),
+                              Icon(
+                                _showDetails
+                                    ? Icons.keyboard_arrow_up
+                                    : Icons.keyboard_arrow_down,
+                                color: Colors.white,
+                              ),
                             ],
                           ),
-                          crossFadeState: _isExpanded
-                              ? CrossFadeState.showSecond
-                              : CrossFadeState.showFirst,
-                          duration: const Duration(milliseconds: 300),
                         ),
-                        const SizedBox(height: 16),
-                        Center(
-                          child: TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _isExpanded = !_isExpanded;
-                              });
-                            },
-                            child: Text(
-                              _isExpanded ? "Ver menos" : "Ver más",
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          child: _showDetails
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      "Tarifas:",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.indigo[700],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    ...widget.toll.tarifas.map(
+                                      (tarifa) => Card(
+                                        margin:
+                                            const EdgeInsets.only(bottom: 8),
+                                        elevation: 2,
+                                        color: Colors.indigo[50],
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12),
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.attach_money,
+                                                  color: Colors.indigo[400]),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Wrap(
+                                                      spacing: 4,
+                                                      runSpacing: 4,
+                                                      children: tarifa
+                                                          .clasificacion
+                                                          .map((clase) => Chip(
+                                                                label:
+                                                                    Text(clase),
+                                                                backgroundColor:
+                                                                    Colors.indigo[
+                                                                        100],
+                                                                labelStyle:
+                                                                    GoogleFonts
+                                                                        .poppins(
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                          .indigo[
+                                                                      700],
+                                                                ),
+                                                              ))
+                                                          .toList(),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      "\$${tarifa.monto.toStringAsFixed(2)}",
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Colors.indigo[700],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : const SizedBox.shrink(),
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-            ),
+              Positioned(
+                top: 5,
+                right: 5,
+                child: IconButton(
+                  onPressed: () {
+                    context.goNamed(EditTollPage.name, extra: {
+                      "toll": widget.toll,
+                    });
+                  },
+                  icon: const Icon(
+                    // ignore: deprecated_member_use
+                    FontAwesomeIcons.edit,
+                    size: 40,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
-    ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.2, end: 0);
+    )
+        .animate()
+        .fadeIn(duration: const Duration(milliseconds: 500))
+        .slideY(begin: 0.2, end: 0);
   }
 }

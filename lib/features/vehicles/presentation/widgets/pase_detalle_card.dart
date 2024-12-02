@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:dash_pass_web/models/pase_detalle_model.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -47,7 +46,7 @@ class PaseDetalleCard extends StatelessWidget {
           ),
         ),
       ),
-    ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.2, end: 0);
+    );
   }
 
   Widget _buildHeader(BuildContext context) {

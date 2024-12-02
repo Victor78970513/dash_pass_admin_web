@@ -12,6 +12,7 @@ class UsersCubit extends Cubit<UsersState> {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   int usersQuantity = 0;
+  List<UserAppModel> usersToReport = [];
 
   Future<void> fetchUsers() async {
     emit(UsersLoading());
@@ -26,6 +27,7 @@ class UsersCubit extends Cubit<UsersState> {
         return UserAppModel.fromMap(data);
       }).toList();
       usersQuantity = users.length;
+      usersToReport.addAll(users);
       emit(UsersLoaded(users: users));
     }).onError((error) {
       print("Error al cargar usuarios: $error");

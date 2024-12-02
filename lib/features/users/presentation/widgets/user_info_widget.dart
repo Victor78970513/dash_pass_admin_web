@@ -174,7 +174,7 @@ class UserInfoWidget extends StatelessWidget {
                           ],
                         ).then((value) {
                           if (value == 'edit') {
-                            context.go(
+                            context.goNamed(
                               EditUserPage.name,
                               extra: {
                                 "user": user,

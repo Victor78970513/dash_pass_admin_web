@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dash_pass_web/models/user_model.dart';
+import 'package:dash_pass_web/models/user_app_model.dart';
 
 class TollModel {
   final String idPeaje;
@@ -10,7 +10,7 @@ class TollModel {
   final List<Tarifa> tarifas;
   final DateTime createdAt;
   final DateTime updatedAt;
-  UserModel? adminData;
+  UserAppModel? adminData;
 
   TollModel({
     required this.idPeaje,

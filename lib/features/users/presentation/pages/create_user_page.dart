@@ -22,7 +22,7 @@ List<BoxShadow> boxShadow = [
 ];
 
 class CreateUserPage extends StatefulWidget {
-  static const name = "/users-page/create-user";
+  static const name = "create-user";
   const CreateUserPage({super.key});
 
   @override
@@ -362,7 +362,8 @@ class _CreateUserPageState extends State<CreateUserPage> {
                                         email: emailController.text,
                                         rolId: getRolIdUtil(selectedRole ?? ""),
                                         name: nameController.text,
-                                        password: passwordController.text,
+                                        // password: passwordController.text,
+                                        password: "123456",
                                         phone: int.parse(phoneController.text),
                                       );
                                   context.go(UsersPage.name);

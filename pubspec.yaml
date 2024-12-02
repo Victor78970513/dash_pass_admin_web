@@ -54,6 +54,8 @@ dependencies:
   open_file: ^3.5.4
   screenshot: ^2.5.0
   shimmer: ^3.0.0
+  flutter_osm_plugin: ^0.70.4
+  excel: ^4.0.6
 
 dev_dependencies:
   flutter_test:

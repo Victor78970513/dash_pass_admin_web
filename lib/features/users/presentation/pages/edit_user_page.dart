@@ -18,7 +18,7 @@ List<BoxShadow> boxShadow = [
 ];
 
 class EditUserPage extends StatefulWidget {
-  static const name = "/users-page/edit-user";
+  static const name = "edit-user";
 
   final UserAppModel user;
   const EditUserPage({super.key, required this.user});

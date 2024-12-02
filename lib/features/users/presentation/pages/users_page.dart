@@ -83,7 +83,7 @@ class _UsersPageState extends State<UsersPage> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(
-                            color: Color.fromARGB(255, 176, 181, 185)),
+                            color: const Color.fromARGB(255, 176, 181, 185)),
                       ),
                       child: Row(
                         children: [
@@ -111,7 +111,7 @@ class _UsersPageState extends State<UsersPage> {
                   UsersPageActionButton(
                     title: "Crear usuario",
                     icon: Icons.person_add_alt_1_outlined,
-                    onTap: () => context.go(CreateUserPage.name),
+                    onTap: () => context.goNamed(CreateUserPage.name),
                   ),
                   const SizedBox(width: 20),
                 ],

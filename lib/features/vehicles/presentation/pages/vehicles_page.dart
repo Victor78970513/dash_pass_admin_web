@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dash_pass_web/features/vehicles/presentation/widgets/pase_detalle_card.dart';
+import 'package:dash_pass_web/features/vehicles/presentation/widgets/vehicles_loading_shimmer.dart';
+import 'package:dash_pass_web/main.dart';
 import 'package:dash_pass_web/models/pase_detalle_model.dart';
 import 'package:dash_pass_web/models/toll_model.dart';
 import 'package:dash_pass_web/models/user_app_model.dart';
@@ -134,7 +136,7 @@ class _VehiclesPageState extends State<VehiclesPage> {
                   builder: (context, paseSnapshot) {
                     if (paseSnapshot.connectionState ==
                         ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const VehiclesLoadingShimmer();
                     }
 
                     if (paseSnapshot.hasError) {
@@ -145,6 +147,8 @@ class _VehiclesPageState extends State<VehiclesPage> {
                     }
 
                     if (paseSnapshot.hasData) {
+                      pasesToReport.clear();
+                      pasesToReport.addAll(paseSnapshot.data!);
                       final pases = paseSnapshot.data!;
                       final filteredPases = pases
                           .where((pase) => pase.vehiculo.placa
@@ -173,7 +177,7 @@ class _VehiclesPageState extends State<VehiclesPage> {
                 );
               },
             ),
-          )
+          ),
         ],
       ),
     );
@@ -212,45 +216,3 @@ class _VehiclesPageState extends State<VehiclesPage> {
     throw Exception('Peaje no encontrado');
   }
 }
-
-
-
-
-
-
-
-  // Material(
-                //   elevation: 6,
-                //   borderRadius: BorderRadius.circular(15),
-                //   child: GestureDetector(
-                //     onTap: () {},
-                //     child: Container(
-                //       height: 60,
-                //       decoration: BoxDecoration(
-                //         color: const Color(0xFF1C3C63),
-                //         borderRadius: BorderRadius.circular(15),
-                //       ),
-                //       child: Padding(
-                //         padding: const EdgeInsets.symmetric(
-                //             vertical: 10, horizontal: 10),
-                //         child: Row(
-                //           children: [
-                //             const Icon(
-                //               Icons.person_add,
-                //               color: Colors.white,
-                //             ),
-                //             const SizedBox(width: 10),
-                //             Text(
-                //               "Agregar usuario",
-                //               style: GoogleFonts.poppins(
-                //                 color: Colors.white,
-                //                 fontSize: 18,
-                //               ),
-                //             ),
-                //             const SizedBox(width: 10),
-                //           ],
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ),
